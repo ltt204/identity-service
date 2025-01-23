@@ -1,5 +1,6 @@
 package org.ltt204.identityservice.controller;
 
+import jakarta.validation.Valid;
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
 import org.ltt204.identityservice.entity.User;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    ResponseEntity<User> createUser(@RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {
+    ResponseEntity<User> createUser(@Valid @RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {
         var createdUser = userService.createUser(requestDto);
         var locationOfNewUser = ucb.path("/users/{id}").buildAndExpand(createdUser.getId()).toUri();
 
