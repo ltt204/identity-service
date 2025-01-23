@@ -3,18 +3,17 @@ package org.ltt204.identityservice.service;
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
 import org.ltt204.identityservice.entity.User;
+import org.ltt204.identityservice.exception.customexception.ResourceConflictException;
+import org.ltt204.identityservice.exception.customexception.ResourceNotFoundException;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,7 +27,11 @@ public class UserService {
     }
 
     public User createUser(UserCreateRequestDto request) {
-        var user =  new User();
+        var user = new User();
+
+        if (userRepository.existsUsersByUserName(request.getUserName())) {
+            throw new ResourceConflictException("Username already exists");
+        }
 
         user.setUserName(request.getUserName());
         user.setPassWord(request.getPassWord());
@@ -51,8 +54,8 @@ public class UserService {
         );
     }
 
-    public Optional<User> findById(String userId) {
-        return userRepository.findById(userId);
+    public User findById(String userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     public User updateUser(String userId, UserUpdateRequestDto request) {
@@ -68,7 +71,8 @@ public class UserService {
         return user;
     }
 
-    public void deleteUser(User user) {
+    public void deleteUser(String userId) {
+        var user = findById(userId);
         userRepository.delete(user);
     }
 }

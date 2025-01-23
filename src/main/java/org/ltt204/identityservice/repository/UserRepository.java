@@ -13,6 +13,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     Page<User> findAll(Pageable pageable);
 
     User getUserById(String id);
-    
-    boolean existsUsersById(String id);
+
+    boolean existsUsersByUserName(String userName);
 }

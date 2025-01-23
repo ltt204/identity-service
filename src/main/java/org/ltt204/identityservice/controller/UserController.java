@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/{userId}")
     ResponseEntity<User> getUserById(@PathVariable String userId) {
         var user = userService.findById(userId);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping
@@ -48,13 +48,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     ResponseEntity<Void> deleteUser(@PathVariable String userId) {
-        var existingUser = userService.findById(userId);
-
-        if (existingUser.isPresent()) {
-            userService.deleteUser(existingUser.get());
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.notFound().build();
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }
