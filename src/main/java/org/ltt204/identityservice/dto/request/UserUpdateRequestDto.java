@@ -2,20 +2,11 @@ package org.ltt204.identityservice.dto.request;
 
 import java.time.LocalDate;
 
-public class UserCreateRequestDto {
-    private String userName;
+public class UserUpdateRequestDto {
     private String passWord;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
 
     public String getPassWord() {
         return passWord;
