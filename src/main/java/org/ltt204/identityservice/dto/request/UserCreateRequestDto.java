@@ -2,59 +2,26 @@ package org.ltt204.identityservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.ltt204.identityservice.exception.customererror.ApplicationError;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateRequestDto {
     @Size(min = 3, message = "INVALID_USERNAME")
-    private String userName;
+    String username;
     @Size(min = 8, message = "INVALID_PASSWORD")
-    private String passWord;
-
-    @NotBlank
-    private String firstName;
-    @NotBlank
-    private String lastName;
-    private LocalDate dateOfBirth;
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
+    String password;
+    @NotBlank(message = "FIRSTNAME_REQUIRED")
+    String firstName;
+    @NotBlank(message = "LASTNAME_REQUIRED")
+    String lastName;
+    LocalDate dateOfBirth;
 }
