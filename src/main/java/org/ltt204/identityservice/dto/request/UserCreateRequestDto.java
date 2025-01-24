@@ -2,13 +2,14 @@ package org.ltt204.identityservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.ltt204.identityservice.exception.customererror.ApplicationError;
 
 import java.time.LocalDate;
 
 public class UserCreateRequestDto {
-    @Size(min = 3, message = "Username must be at least 3 characters")
+    @Size(min = 3, message = "INVALID_USERNAME")
     private String userName;
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 8, message = "INVALID_PASSWORD")
     private String passWord;
 
     @NotBlank

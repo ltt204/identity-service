@@ -3,6 +3,7 @@ package org.ltt204.identityservice.controller;
 import jakarta.validation.Valid;
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
+import org.ltt204.identityservice.dto.response.ApplicationPaginationResponseDto;
 import org.ltt204.identityservice.entity.User;
 import org.ltt204.identityservice.service.UserService;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    ResponseEntity<User> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequestDto requestDto) {
+    ResponseEntity<User> updateUser(@PathVariable String userId, @RequestBody @Valid UserUpdateRequestDto requestDto) {
         var user = userService.updateUser(userId, requestDto);
 
         return ResponseEntity.ok(user);
