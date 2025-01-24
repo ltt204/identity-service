@@ -3,6 +3,9 @@ server:
   servlet:
     context-path: /identity
 
+logging:
+  level:
+    org.springframework.security.web: DEBUG
 
 spring:
   datasource:

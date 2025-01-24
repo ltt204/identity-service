@@ -43,7 +43,6 @@ public class UserController {
     ResponseEntity<ApplicationResponseDto<ListResponse<UserDto>>> getUsers(Pageable pageable) {
         var pageResult = userService.findAll(pageable);
 
-        // TODO: use mapstruct for mapping Page<T> to PageDto.
         var pageDto = PageDto.builder()
                 .totalElements(pageResult.getTotalElements())
                 .pageSize(pageResult.getSize())
