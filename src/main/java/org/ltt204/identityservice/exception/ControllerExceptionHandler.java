@@ -18,50 +18,33 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingRuntimeException(RuntimeException exception) {
-        var response = new ApplicationResponseDto<>();
-
-        response.setCode(ApplicationError.UNCATEGORIZED.getCode());
-        response.setMessage(ApplicationError.UNCATEGORIZED.getMessage());
-
+        var response = ApplicationResponseDto.failure(ApplicationError.UNCATEGORIZED);
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-        var applicationResponseDto = new ApplicationResponseDto<>();
-
         var enumKey = exception.getFieldError().getDefaultMessage();
-
         var error = ApplicationError.INVALID_ERROR_KEY;
-
         try {
             error = ApplicationError.valueOf(enumKey);
         } catch (IllegalIdentifierException e) {
             // TODO: Handle later
         }
-
-        applicationResponseDto.setCode(error.getCode());
-        applicationResponseDto.setMessage(error.getMessage());
-
-        return ResponseEntity.badRequest().body(applicationResponseDto);
+        var response = ApplicationResponseDto.failure(error);
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingResourceNotFoundException(ResourceNotFoundException exception) {
-        var applicationResponseDto = new ApplicationResponseDto<>();
-        applicationResponseDto.setCode(exception.getError().getCode());
-        applicationResponseDto.setMessage(exception.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(applicationResponseDto);
+        var response = ApplicationResponseDto.failure(exception.getError());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(value = ResourceConflictException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingResourceConflictException(ResourceConflictException exception) {
-        var applicationResponseDto = new ApplicationResponseDto<>();
-        applicationResponseDto.setCode(exception.getError().getCode());
-        applicationResponseDto.setMessage(exception.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(applicationResponseDto);
+        var response = ApplicationResponseDto.failure(exception.getError());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 
     }
 }

@@ -1,35 +1,35 @@
 package org.ltt204.identityservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+import org.ltt204.identityservice.exception.customererror.ApplicationError;
 
+@Data
+@Builder(toBuilder = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApplicationResponseDto<T> {
-    private long code;
-    private String message;
-    private T content;
+    @Builder.Default
+    long code = 1000;
 
-    public long getCode() {
-        return code;
+    @Builder.Default
+    String message = "success";
+
+    T content;
+
+    public static <T> ApplicationResponseDto<T> success(T content) {
+        return ApplicationResponseDto.<T>builder()
+                .content(content)
+                .build();
     }
 
-    public void setCode(long code) {
-        this.code = code;
+    public static <T> ApplicationResponseDto<T> failure(ApplicationError exception) {
+        return ApplicationResponseDto.<T>builder()
+                .code(exception.getCode())
+                .message(exception.getMessage())
+                .build();
     }
-
-    public T getContent() {
-        return content;
-    }
-
-    public void setContent(T content) {
-        this.content = content;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
 }
