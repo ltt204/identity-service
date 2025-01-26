@@ -2,7 +2,7 @@ package org.ltt204.identityservice.mapper;
 
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
-import org.ltt204.identityservice.dto.response.UserDto;
+import org.ltt204.identityservice.dto.response.user.UserDto;
 import org.ltt204.identityservice.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

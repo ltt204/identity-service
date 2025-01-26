@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.ltt204.identityservice.dto.request.UserSignInRequestDto;
-import org.ltt204.identityservice.dto.response.ApplicationResponseDto;
+import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
 import org.ltt204.identityservice.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
