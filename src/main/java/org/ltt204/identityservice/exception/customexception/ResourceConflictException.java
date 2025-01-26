@@ -1,14 +1,16 @@
 package org.ltt204.identityservice.exception.customexception;
 
-import org.ltt204.identityservice.exception.customererror.ApplicationError;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import org.ltt204.identityservice.exception.customererror.ErrorCode;
 
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ResourceConflictException extends RuntimeException {
-    public ApplicationError getError() {
-        return error;
-    }
 
-    private final ApplicationError error;
-    public ResourceConflictException(ApplicationError error) {
+    ErrorCode error;
+    public ResourceConflictException(ErrorCode error) {
         super(error.getMessage());
 
         this.error =error;

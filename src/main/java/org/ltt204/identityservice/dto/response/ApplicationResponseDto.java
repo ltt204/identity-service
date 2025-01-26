@@ -1,12 +1,11 @@
 package org.ltt204.identityservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.ltt204.identityservice.exception.customererror.ApplicationError;
+import org.ltt204.identityservice.exception.customererror.ErrorCode;
 
 @Data
 @Builder(toBuilder = true)
@@ -25,7 +24,7 @@ public class ApplicationResponseDto<T> {
                 .build();
     }
 
-    public static <T> ApplicationResponseDto<T> failure(ApplicationError exception) {
+    public static <T> ApplicationResponseDto<T> failure(ErrorCode exception) {
         return ApplicationResponseDto.<T>builder()
                 .code(exception.getCode())
                 .message(exception.getMessage())

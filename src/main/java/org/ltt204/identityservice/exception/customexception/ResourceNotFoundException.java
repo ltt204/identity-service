@@ -1,13 +1,16 @@
 package org.ltt204.identityservice.exception.customexception;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.ltt204.identityservice.exception.customererror.ApplicationError;
+import lombok.experimental.FieldDefaults;
+import org.ltt204.identityservice.exception.customererror.ErrorCode;
 
 @Getter
-public class ResourceNotFoundException extends RuntimeException{
-    private final ApplicationError error;
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class ResourceNotFoundException extends RuntimeException {
+    ErrorCode error;
 
-    public ResourceNotFoundException(ApplicationError error) {
+    public ResourceNotFoundException(ErrorCode error) {
         super(error.getMessage());
         this.error = error;
     }

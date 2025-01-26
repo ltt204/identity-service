@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
 import org.ltt204.identityservice.dto.response.UserDto;
-import org.ltt204.identityservice.exception.customererror.ApplicationError;
+import org.ltt204.identityservice.exception.customererror.ErrorCode;
 import org.ltt204.identityservice.exception.customexception.ResourceConflictException;
 import org.ltt204.identityservice.exception.customexception.ResourceNotFoundException;
 import org.ltt204.identityservice.mapper.UserMapper;
@@ -28,7 +28,7 @@ public class UserService {
 
     public UserDto createUser(UserCreateRequestDto request) {
         if (userRepository.existsUsersByUsername(request.getUsername())) {
-            var error = ApplicationError.CONFLICT;
+            var error = ErrorCode.CONFLICT;
             error.setMessage("Username is already taken");
 
             throw new ResourceConflictException(error);
@@ -54,7 +54,7 @@ public class UserService {
     public UserDto findById(String userId) {
         return userMapper.toUserDto(
                 userRepository.findById(userId).orElseThrow(() -> {
-                            var error = ApplicationError.NOT_FOUND;
+                            var error = ErrorCode.NOT_FOUND;
                             error.setMessage("User is not existed");
                             return new ResourceNotFoundException(error);
                         }
@@ -64,7 +64,7 @@ public class UserService {
 
     public UserDto updateUser(String userId, UserUpdateRequestDto request) {
         var user = userRepository.findById(userId).orElseThrow(() -> {
-                    var error = ApplicationError.NOT_FOUND;
+                    var error = ErrorCode.NOT_FOUND;
                     error.setMessage("User is not existed");
                     return new ResourceNotFoundException(error);
                 }
@@ -76,7 +76,7 @@ public class UserService {
 
     public void deleteUser(String userId) {
         var user = userRepository.findById(userId).orElseThrow(() -> {
-            var error = ApplicationError.NOT_FOUND;
+            var error = ErrorCode.NOT_FOUND;
             error.setMessage("User is not existed");
             return new ResourceNotFoundException(error);
         });
