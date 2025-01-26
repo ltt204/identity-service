@@ -1,6 +1,5 @@
-package org.ltt204.identityservice.dto.response;
+package org.ltt204.identityservice.dto.response.user;
 
-import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

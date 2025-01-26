@@ -1,11 +1,10 @@
-package org.ltt204.identityservice.dto.response;
+package org.ltt204.identityservice.dto.response.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
