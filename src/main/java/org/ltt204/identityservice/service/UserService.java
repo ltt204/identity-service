@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
-import org.ltt204.identityservice.dto.response.UserDto;
-import org.ltt204.identityservice.exception.customererror.ErrorCode;
-import org.ltt204.identityservice.exception.customexception.ResourceConflictException;
-import org.ltt204.identityservice.exception.customexception.ResourceNotFoundException;
+import org.ltt204.identityservice.dto.response.user.UserDto;
+import org.ltt204.identityservice.exception.ErrorCode;
+import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.mapper.UserMapper;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,7 @@ public class UserService {
             var error = ErrorCode.CONFLICT;
             error.setMessage("Username is already taken");
 
-            throw new ResourceConflictException(error);
+            throw new AppException(error);
         }
 
         var user = userMapper.toUser(request);
@@ -56,7 +55,7 @@ public class UserService {
                 userRepository.findById(userId).orElseThrow(() -> {
                             var error = ErrorCode.NOT_FOUND;
                             error.setMessage("User is not existed");
-                            return new ResourceNotFoundException(error);
+                            return new AppException(error);
                         }
                 )
         );
@@ -66,7 +65,7 @@ public class UserService {
         var user = userRepository.findById(userId).orElseThrow(() -> {
                     var error = ErrorCode.NOT_FOUND;
                     error.setMessage("User is not existed");
-                    return new ResourceNotFoundException(error);
+                    return new AppException(error);
                 }
         );
         userMapper.updateUser(user, request);
@@ -78,7 +77,7 @@ public class UserService {
         var user = userRepository.findById(userId).orElseThrow(() -> {
             var error = ErrorCode.NOT_FOUND;
             error.setMessage("User is not existed");
-            return new ResourceNotFoundException(error);
+            return new AppException(error);
         });
         userRepository.delete(user);
     }

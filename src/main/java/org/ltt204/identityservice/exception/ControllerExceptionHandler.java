@@ -1,10 +1,7 @@
 package org.ltt204.identityservice.exception;
 
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
-import org.ltt204.identityservice.dto.response.ApplicationResponseDto;
-import org.ltt204.identityservice.exception.customererror.ErrorCode;
-import org.ltt204.identityservice.exception.customexception.ResourceConflictException;
-import org.ltt204.identityservice.exception.customexception.ResourceNotFoundException;
+import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,18 +30,10 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
     }
 
-    @ExceptionHandler(value = ResourceNotFoundException.class)
-    ResponseEntity<ApplicationResponseDto<?>> handlingResourceNotFoundException(ResourceNotFoundException exception) {
+    @ExceptionHandler(value = AppException.class)
+    ResponseEntity<ApplicationResponseDto<?>> handlingAppException(AppException exception) {
         var error = exception.getError();
         var response = ApplicationResponseDto.failure(error);
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
-    }
-
-    @ExceptionHandler(value = ResourceConflictException.class)
-    ResponseEntity<ApplicationResponseDto<?>> handlingResourceConflictException(ResourceConflictException exception) {
-        var error = exception.getError();
-        var response = ApplicationResponseDto.failure(error);
-        return ResponseEntity.status(error.getHttpStatusCode()).body(response);
-
     }
 }
