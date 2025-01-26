@@ -19,7 +19,9 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable();
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers("/auth/signin").anonymous());
+                request.requestMatchers("/auth/signin").anonymous()
+                        .requestMatchers("/auth/introspect").anonymous()
+        );
 
         return httpSecurity.build();
     }

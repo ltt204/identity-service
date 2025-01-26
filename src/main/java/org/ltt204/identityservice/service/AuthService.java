@@ -2,21 +2,26 @@ package org.ltt204.identityservice.service;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.ltt204.identityservice.dto.request.IntrospectRequestDto;
 import org.ltt204.identityservice.dto.request.UserSignInRequestDto;
 import org.ltt204.identityservice.dto.response.auth.AuthenticationResponseDto;
-import org.ltt204.identityservice.exception.ErrorCode;
+import org.ltt204.identityservice.dto.response.auth.IntrospectResponseDto;
 import org.ltt204.identityservice.exception.AppException;
+import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -38,7 +43,30 @@ public class AuthService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
 
-    public AuthenticationResponseDto signIn(UserSignInRequestDto requestDto) {
+    public IntrospectResponseDto introspect(IntrospectRequestDto introspectRequestDto) {
+        var token = introspectRequestDto.getToken();
+
+        try {
+            JWSVerifier jwsVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
+
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return IntrospectResponseDto.builder()
+                    .valid(
+                            jwsVerifier.verify(
+                                    signedJWT.getHeader(),
+                                    signedJWT.getSigningInput(),
+                                    signedJWT.getSignature()
+                            )
+                    )
+                    .build();
+
+        } catch (JOSEException | ParseException e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
+    public AuthenticationResponseDto authenticate(UserSignInRequestDto requestDto) {
         var user = userRepository.findFirstByUsername(requestDto.getUsername()).orElseThrow(() ->
         {
             var error = ErrorCode.NOT_FOUND;
@@ -78,7 +106,7 @@ public class AuthService {
             jwsObject.sign(new MACSigner(ACCESS_TOKEN_SIGNER_KEY));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            log.error(e.getLocalizedMessage());
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
