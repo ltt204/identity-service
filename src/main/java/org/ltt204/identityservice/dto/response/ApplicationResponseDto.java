@@ -1,6 +1,7 @@
 package org.ltt204.identityservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +15,7 @@ import org.ltt204.identityservice.exception.customererror.ApplicationError;
 public class ApplicationResponseDto<T> {
     @Builder.Default
     long code = 1000;
-
-    @Builder.Default
-    String message = "success";
+    String message;
 
     T content;
 
