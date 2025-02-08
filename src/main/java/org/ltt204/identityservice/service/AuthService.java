@@ -14,6 +14,7 @@ import org.ltt204.identityservice.dto.request.IntrospectRequestDto;
 import org.ltt204.identityservice.dto.request.UserSignInRequestDto;
 import org.ltt204.identityservice.dto.response.auth.AuthenticationResponseDto;
 import org.ltt204.identityservice.dto.response.auth.IntrospectResponseDto;
+import org.ltt204.identityservice.entity.User;
 import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.repository.UserRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 
 @Slf4j
@@ -48,15 +50,14 @@ public class AuthService {
 
         try {
             JWSVerifier jwsVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
-
             SignedJWT signedJWT = SignedJWT.parse(token);
+
+            var valid = signedJWT.verify(jwsVerifier);
+            var isExpired = signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
+
             return IntrospectResponseDto.builder()
                     .valid(
-                            jwsVerifier.verify(
-                                    signedJWT.getHeader(),
-                                    signedJWT.getSigningInput(),
-                                    signedJWT.getSignature()
-                            )
+                            valid && isExpired
                     )
                     .build();
 
@@ -74,7 +75,7 @@ public class AuthService {
             return new AppException(error);
         });
 
-        var token = generateToken(user.getUsername());
+        var token = generateToken(user);
 
         if (passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             return AuthenticationResponseDto.builder()
@@ -86,16 +87,17 @@ public class AuthService {
         throw new AppException(ErrorCode.UNAUTHENTICATED);
     }
 
-    private String generateToken(String userName) {
+    private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(userName)
+                .subject(user.getUsername())
                 .issuer("ltt204.org")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.HOURS).toEpochMilli()
                 ))
+                .claim("role", user.getRoles())
                 .build();
 
         Payload payload = claimsSet.toPayload();
