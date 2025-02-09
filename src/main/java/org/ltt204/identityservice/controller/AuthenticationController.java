@@ -3,8 +3,8 @@ package org.ltt204.identityservice.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.ltt204.identityservice.dto.request.IntrospectRequestDto;
-import org.ltt204.identityservice.dto.request.UserSignInRequestDto;
+import org.ltt204.identityservice.dto.request.token.TokenIntrospectRequestDto;
+import org.ltt204.identityservice.dto.request.user.UserSignInRequestDto;
 import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
 import org.ltt204.identityservice.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
-    ResponseEntity<ApplicationResponseDto<?>> introspect(@RequestBody IntrospectRequestDto introspectRequestDto) {
+    ResponseEntity<ApplicationResponseDto<?>> introspect(@RequestBody TokenIntrospectRequestDto introspectRequestDto) {
         return ResponseEntity.ok(
                 ApplicationResponseDto.success(
                         authService.introspect(introspectRequestDto)

@@ -4,14 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
-import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
+import org.ltt204.identityservice.dto.request.user.UserCreateRequestDto;
+import org.ltt204.identityservice.dto.request.user.UserUpdateRequestDto;
 import org.ltt204.identityservice.dto.response.user.UserDto;
+import org.ltt204.identityservice.entity.Role;
 import org.ltt204.identityservice.entity.User;
-import org.ltt204.identityservice.enums.Roles;
 import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.mapper.UserMapper;
+import org.ltt204.identityservice.repository.RoleRepository;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,10 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserService {
+    String DEFAULT_ROLE = "USER";
+
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -48,16 +52,15 @@ public class UserService {
         var user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Roles.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName(DEFAULT_ROLE));
 
         user.setRoles(roles);
-
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<UserDto> findAll(Pageable pageable) {
         return userRepository.findAll(
                 PageRequest.of(
@@ -75,7 +78,7 @@ public class UserService {
         return userMapper.toUserDto(user);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @PostAuthorize("returnObject.username == authentication.name")
     public UserDto findById(String userId) {
         SecurityContext contextHolder = SecurityContextHolder.getContext();
@@ -92,7 +95,7 @@ public class UserService {
         );
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    @PreAuthorize("hasAuthority('UPDATE_DATA')")
     @PostAuthorize("returnObject.username == authentication.name")
     public UserDto updateUser(String userId, UserUpdateRequestDto request) {
         var user = userRepository.findById(userId).orElseThrow(() -> {
@@ -101,12 +104,20 @@ public class UserService {
                     return new AppException(error);
                 }
         );
+
+        HashSet<Role> roles = new HashSet<>();
+        roles.add(
+                roleRepository.findAllByNameIn(request.getRoles())
+        );
+
         userMapper.updateUser(user, request);
+        user.setRoles(roles);
+
         userRepository.save(user);
         return userMapper.toUserDto(user);
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(String userId) {
         var user = userRepository.findById(userId).orElseThrow(() -> {
             var error = ErrorCode.NOT_FOUND;

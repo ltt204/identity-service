@@ -16,7 +16,6 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String username;
@@ -24,5 +23,7 @@ public class User {
     String firstName;
     String lastName;
     LocalDate dateOfBirth;
-    Set<String> roles;
+
+    @ManyToMany
+    Set<Role> roles;
 }

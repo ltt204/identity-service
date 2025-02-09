@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.ltt204.identityservice.dto.request.IntrospectRequestDto;
-import org.ltt204.identityservice.dto.request.UserSignInRequestDto;
+import org.ltt204.identityservice.dto.request.token.TokenIntrospectRequestDto;
+import org.ltt204.identityservice.dto.request.user.UserSignInRequestDto;
 import org.ltt204.identityservice.dto.response.auth.AuthenticationResponseDto;
 import org.ltt204.identityservice.dto.response.auth.IntrospectResponseDto;
 import org.ltt204.identityservice.entity.User;
@@ -19,6 +19,9 @@ import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -26,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.StringJoiner;
 
@@ -47,7 +49,7 @@ public class AuthService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
 
-    public IntrospectResponseDto introspect(IntrospectRequestDto introspectRequestDto) {
+    public IntrospectResponseDto introspect(TokenIntrospectRequestDto introspectRequestDto) {
         var token = introspectRequestDto.getToken();
 
         try {
@@ -119,7 +121,7 @@ public class AuthService {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
         if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(stringJoiner::add);
+            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
         }
 
         return stringJoiner.toString();
