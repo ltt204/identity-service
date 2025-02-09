@@ -20,14 +20,14 @@ public enum ErrorCode {
     LASTNAME_REQUIRED(2001, "Lastname is required", HttpStatus.BAD_REQUEST),
     INVALID_USERNAME(2002, "Username must be at least 3 characters", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(2003, "Password must be at least 8 characters", HttpStatus.BAD_REQUEST),
-    ACCESS_DENIED(2004, "You are not authorize for this", HttpStatus.NOT_FOUND),
 
     // 3xxx
     CONFLICT(3000, "Resource already existed", HttpStatus.NOT_FOUND),
     NOT_FOUND(3001, "Resource not found", HttpStatus.NOT_FOUND),
 
     // 4xxx
-    UNAUTHENTICATED(4000, "Authentication failed", HttpStatus.UNAUTHORIZED)
+    UNAUTHENTICATED(4000, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    UNAUTHORIZED(4001, "You are not authorized for this action", HttpStatus.FORBIDDEN),
     ;
 
     private long code;

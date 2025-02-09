@@ -5,12 +5,10 @@ import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 
 @Slf4j
@@ -47,7 +45,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingAuthorizeException(AuthorizationDeniedException exception) {
-        var error = ErrorCode.ACCESS_DENIED;
+        var error = ErrorCode.UNAUTHORIZED;
         var response = ApplicationResponseDto.failure(error);
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
     }
