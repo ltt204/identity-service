@@ -21,12 +21,14 @@ import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Slf4j
 @Service
@@ -97,7 +99,7 @@ public class AuthService {
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.HOURS).toEpochMilli()
                 ))
-                .claim("role", user.getRoles())
+                .claim("scope", buildScope(user))
                 .build();
 
         Payload payload = claimsSet.toPayload();
@@ -111,5 +113,15 @@ public class AuthService {
             log.error(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(stringJoiner::add);
+        }
+
+        return stringJoiner.toString();
     }
 }

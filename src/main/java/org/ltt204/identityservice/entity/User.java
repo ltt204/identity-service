@@ -1,18 +1,15 @@
 package org.ltt204.identityservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.mapping.Join;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -27,14 +24,5 @@ public class User {
     String firstName;
     String lastName;
     LocalDate dateOfBirth;
-
-    @ManyToMany(
-            cascade = {CascadeType.PERSIST}
-    )
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn (name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    Set<Role> roles;
+    Set<String> roles;
 }

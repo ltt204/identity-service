@@ -20,6 +20,7 @@ public enum ErrorCode {
     LASTNAME_REQUIRED(2001, "Lastname is required", HttpStatus.BAD_REQUEST),
     INVALID_USERNAME(2002, "Username must be at least 3 characters", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(2003, "Password must be at least 8 characters", HttpStatus.BAD_REQUEST),
+    ACCESS_DENIED(2004, "You are not authorize for this", HttpStatus.NOT_FOUND),
 
     // 3xxx
     CONFLICT(3000, "Resource already existed", HttpStatus.NOT_FOUND),

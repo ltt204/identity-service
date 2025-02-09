@@ -39,6 +39,13 @@ public class UserController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @GetMapping("/info")
+    ResponseEntity<ApplicationResponseDto<UserDto>> getPersonalInfo() {
+        var user = userService.getPersonalInfo();
+        var responseBody = ApplicationResponseDto.success(user);
+        return ResponseEntity.ok(responseBody);
+    }
+
     @GetMapping
     ResponseEntity<ApplicationResponseDto<ListResponse<UserDto>>> getUsers(Pageable pageable) {
         var pageResult = userService.findAll(pageable);
