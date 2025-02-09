@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.dto.request;
+package org.ltt204.identityservice.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -7,21 +7,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.ltt204.identityservice.entity.Role;
 
-import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserCreateRequestDto {
+public class UserSignInRequestDto {
     @Size(min = 3, message = "INVALID_USERNAME")
+    @NotBlank
     String username;
+    @NotBlank
     @Size(min = 8, message = "INVALID_PASSWORD")
     String password;
-    @NotBlank(message = "FIRSTNAME_REQUIRED")
-    String firstName;
-    @NotBlank(message = "LASTNAME_REQUIRED")
-    String lastName;
-    LocalDate dateOfBirth;
+    Set<Role> roleSet;
 }

@@ -20,5 +20,5 @@ public class UserDto {
     String firstName;
     String lastName;
     LocalDate dateOfBirth;
-    Set<String> roles;
+    Set<Role> roles;
 }

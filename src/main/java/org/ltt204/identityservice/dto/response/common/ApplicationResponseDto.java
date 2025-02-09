@@ -1,6 +1,7 @@
 package org.ltt204.identityservice.dto.response.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,33 @@ public class ApplicationResponseDto<T> {
     long code = 1000;
     String message;
 
+    @Nullable
     T content;
+
+    public static <T> ApplicationResponseDto<T> success(T content, String message) {
+        return ApplicationResponseDto.<T>builder()
+                .message(message)
+                .content(content)
+                .build();
+    }
 
     public static <T> ApplicationResponseDto<T> success(T content) {
         return ApplicationResponseDto.<T>builder()
                 .content(content)
+                .build();
+    }
+
+    public static <T> ApplicationResponseDto<T> success(String message) {
+        return ApplicationResponseDto.<T>builder()
+                .message(message)
+                .content(null)
+                .build();
+    }
+
+
+    public static <T> ApplicationResponseDto<T> success() {
+        return ApplicationResponseDto.<T>builder()
+                .content(null)
                 .build();
     }
 
