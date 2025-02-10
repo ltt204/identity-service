@@ -33,14 +33,12 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserService {
-    String DEFAULT_ROLE = "USER";
 
     UserRepository userRepository;
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public UserDto createUser(UserCreateRequestDto request) {
         if (userRepository.existsUsersByUsername(request.getUsername())) {
             var error = ErrorCode.CONFLICT;
@@ -53,6 +51,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
+        String DEFAULT_ROLE = "USER";
         roles.add(roleRepository.findByName(DEFAULT_ROLE));
 
         user.setRoles(roles);
@@ -111,6 +110,8 @@ public class UserService {
         );
 
         userMapper.updateUser(user, request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(roles);
 
         userRepository.save(user);
