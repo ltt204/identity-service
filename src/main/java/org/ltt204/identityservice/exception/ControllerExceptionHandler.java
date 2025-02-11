@@ -18,7 +18,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingRuntimeException(RuntimeException exception) {
         var error = ErrorCode.UNCATEGORIZED;
-        log.error(Arrays.toString(exception.getStackTrace()));
+        log.error(exception.getMessage());
         var response = ApplicationResponseDto.failure(error);
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
     }

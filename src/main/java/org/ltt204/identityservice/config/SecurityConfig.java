@@ -1,7 +1,10 @@
 package org.ltt204.identityservice.config;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,10 +29,11 @@ import javax.crypto.spec.SecretKeySpec;
 @ComponentScan
 @EnableWebSecurity
 @EnableMethodSecurity
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SecurityConfig {
-    @Value("${jwt.signerKey}")
-    String SECRET_KEY;
+
+    CustomJwtDecoder customJwtDecoder;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -42,7 +46,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer ->
                                         jwtConfigurer
-                                                .decoder(jwtDecoder())
+                                                .decoder(customJwtDecoder)
                                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                                 )
                                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
@@ -66,14 +70,5 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS256");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
     }
 }
