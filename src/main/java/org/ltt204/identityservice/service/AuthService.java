@@ -19,9 +19,6 @@ import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,22 +46,13 @@ public class AuthService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
 
+    TokenService tokenService;
+
     public IntrospectResponseDto introspect(TokenIntrospectRequestDto introspectRequestDto) {
         var token = introspectRequestDto.getToken();
 
         try {
-            JWSVerifier jwsVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
-            SignedJWT signedJWT = SignedJWT.parse(token);
-
-            var valid = signedJWT.verify(jwsVerifier);
-            var isExpired = signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
-
-            return IntrospectResponseDto.builder()
-                    .valid(
-                            valid && isExpired
-                    )
-                    .build();
-
+            return IntrospectResponseDto.builder().valid(tokenService.isValid(token)).build();
         } catch (JOSEException | ParseException e) {
             log.error(e.getMessage());
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -79,7 +67,7 @@ public class AuthService {
             return new AppException(error);
         });
 
-        var token = generateToken(user);
+        var token = tokenService.generateToken(user);
 
         if (passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             return AuthenticationResponseDto.builder()
@@ -89,41 +77,5 @@ public class AuthService {
         }
 
         throw new AppException(ErrorCode.UNAUTHENTICATED);
-    }
-
-    private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("ltt204.org")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.HOURS).toEpochMilli()
-                ))
-                .claim("scope", buildScope(user))
-                .build();
-
-        Payload payload = claimsSet.toPayload();
-
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(ACCESS_TOKEN_SIGNER_KEY));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String buildScope(User user) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
-        }
-
-        return stringJoiner.toString();
     }
 }
