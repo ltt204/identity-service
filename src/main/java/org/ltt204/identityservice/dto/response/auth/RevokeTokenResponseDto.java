@@ -7,9 +7,8 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AuthenticationResponseDto {
-    boolean authenticated;
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class RevokeTokenResponseDto {
     String accessToken;
     String refreshToken;
 }

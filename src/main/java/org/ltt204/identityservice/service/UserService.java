@@ -33,7 +33,6 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserService {
-
     UserRepository userRepository;
     RoleRepository roleRepository;
     UserMapper userMapper;
@@ -127,4 +126,5 @@ public class UserService {
         });
         userRepository.delete(user);
     }
+
 }
