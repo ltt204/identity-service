@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.dto.response.auth;
+package org.ltt204.identityservice.dto.request.auth;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -7,9 +7,8 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AuthenticationResponseDto {
-    boolean authenticated;
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class RevokeTokenRequestDto {
     String accessToken;
     String refreshToken;
 }

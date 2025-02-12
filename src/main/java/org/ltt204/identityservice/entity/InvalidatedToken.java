@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 
-@Entity(name = "logged_out_token")
+@Entity(name = "invalidated_token")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class LoggedOutToken {
+public class InvalidatedToken {
     @Id
     String token;
     @Column(name = "expiration_time")

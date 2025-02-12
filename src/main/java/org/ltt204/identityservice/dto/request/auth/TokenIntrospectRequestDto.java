@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.dto.request.token;
+package org.ltt204.identityservice.dto.request.auth;
 
 import lombok.AccessLevel;
 import lombok.Builder;
