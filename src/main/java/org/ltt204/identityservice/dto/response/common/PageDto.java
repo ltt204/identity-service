@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.dto.response;
+package org.ltt204.identityservice.dto.response.common;
 
 import lombok.AccessLevel;
 import lombok.Builder;

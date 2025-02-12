@@ -4,12 +4,13 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.ltt204.identityservice.dto.request.UserCreateRequestDto;
-import org.ltt204.identityservice.dto.request.UserUpdateRequestDto;
-import org.ltt204.identityservice.dto.response.ApplicationResponseDto;
-import org.ltt204.identityservice.dto.response.ListResponse;
-import org.ltt204.identityservice.dto.response.PageDto;
-import org.ltt204.identityservice.dto.response.UserDto;
+import org.ltt204.identityservice.dto.request.user.UserCreateRequestDto;
+import org.ltt204.identityservice.dto.request.user.UserUpdateRequestDto;
+import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
+import org.ltt204.identityservice.dto.response.common.ListResponse;
+import org.ltt204.identityservice.dto.response.common.PageDto;
+import org.ltt204.identityservice.dto.response.user.UserDto;
+import org.ltt204.identityservice.service.AuthService;
 import org.ltt204.identityservice.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
+    AuthService authService;
 
     @PostMapping
     ResponseEntity<ApplicationResponseDto<UserDto>> createUser(@Valid @RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {
@@ -39,11 +41,17 @@ public class UserController {
         return ResponseEntity.ok(responseBody);
     }
 
+    @GetMapping("/info")
+    ResponseEntity<ApplicationResponseDto<UserDto>> getPersonalInfo() {
+        var user = userService.getPersonalInfo();
+        var responseBody = ApplicationResponseDto.success(user);
+        return ResponseEntity.ok(responseBody);
+    }
+
     @GetMapping
     ResponseEntity<ApplicationResponseDto<ListResponse<UserDto>>> getUsers(Pageable pageable) {
         var pageResult = userService.findAll(pageable);
 
-        // TODO: use mapstruct for mapping Page<T> to PageDto.
         var pageDto = PageDto.builder()
                 .totalElements(pageResult.getTotalElements())
                 .pageSize(pageResult.getSize())

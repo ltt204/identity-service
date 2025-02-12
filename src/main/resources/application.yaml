@@ -3,13 +3,22 @@ server:
   servlet:
     context-path: /identity
 
+logging:
+  level:
+    org.springframework.security.web: DEBUG
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/identity-service"
+    url: "jdbc:mysql://localhost:3306/identity_service"
     username: "root"
     password: "12022004"
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+jwt:
+    signer-key: "x1GTfAdnglz/9+9bO9Ya615tMoqNFsdQSUQXolWa5CW3jHaFLQIWoguaoD+GlhPp"
+    refresh-signer-key: "7+78pvfH7Pp4WK8py2tecwSfH+Cvt56WKuWNEDOmqsEaiDwjWh2wBI56+gTMMy9S"
+    valid-duration: 3600 # in second
+    refreshable-duration: 360000 # in second

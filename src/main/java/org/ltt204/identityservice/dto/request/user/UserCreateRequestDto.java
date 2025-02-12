@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.dto.request;
+package org.ltt204.identityservice.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
