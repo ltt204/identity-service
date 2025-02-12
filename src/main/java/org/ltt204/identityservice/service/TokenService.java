@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.entity.User;
-import org.ltt204.identityservice.repository.LoggedOutTokenRepository;
+import org.ltt204.identityservice.repository.InvalidatedTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,29 +27,53 @@ import java.util.StringJoiner;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class TokenService {
-    LoggedOutTokenRepository loggedOutTokenRepository;
+    InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.signer-key}")
     String ACCESS_TOKEN_SIGNER_KEY;
     @NonFinal
-    @Value("${jwt.valid-duration}")
+    @Value("${jwt.refreshable-duration}")
     long VALID_DURATION;
 
+    @NonFinal
+    @Value("${jwt.refresh-signer-key}")
+    String REFRESH_TOKEN_SIGNER_KEY;
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    long REFRESHABLE_DURATION;
+
     public boolean isValid(String token) throws JOSEException, ParseException {
-        JWSVerifier jwsVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
+        JWSVerifier jwsAccessVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
+        JWSVerifier jwsRefreshVerifier = new MACVerifier(REFRESH_TOKEN_SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        var valid = signedJWT.verify(jwsVerifier);
+        var valid = signedJWT.verify(jwsAccessVerifier) || signedJWT.verify(jwsRefreshVerifier);
         var isExpired = signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
         return valid && isExpired && !isInBlacklist(token);
     }
 
     public boolean isInBlacklist(String token) {
-        return !loggedOutTokenRepository.findByToken(token).isEmpty();
+        return !invalidatedTokenRepository.findByToken(token).isEmpty();
     }
 
-    public String generateToken(User user) {
+    public String generateAccessToken(User user) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
+
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .subject(user.getUsername())
+                .issuer("ltt204.org")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                ))
+                .claim("scope", buildScope(user))
+                .build();
+
+        return getPayload(header, claimsSet, ACCESS_TOKEN_SIGNER_KEY);
+    }
+
+    public String generateRefreshToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -59,20 +83,9 @@ public class TokenService {
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 ))
-                .claim("scope", buildScope(user))
                 .build();
 
-        Payload payload = claimsSet.toPayload();
-
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(ACCESS_TOKEN_SIGNER_KEY));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return getPayload(header, claimsSet, REFRESH_TOKEN_SIGNER_KEY);
     }
 
     private String buildScope(User user) {
@@ -83,5 +96,19 @@ public class TokenService {
         }
 
         return stringJoiner.toString();
+    }
+
+    private String getPayload(JWSHeader header, JWTClaimsSet claimsSet, String refreshTokenSignerKey) {
+        Payload payload = claimsSet.toPayload();
+
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(refreshTokenSignerKey));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

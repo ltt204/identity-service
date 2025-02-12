@@ -10,6 +10,7 @@ import org.ltt204.identityservice.dto.response.common.ApplicationResponseDto;
 import org.ltt204.identityservice.dto.response.common.ListResponse;
 import org.ltt204.identityservice.dto.response.common.PageDto;
 import org.ltt204.identityservice.dto.response.user.UserDto;
+import org.ltt204.identityservice.service.AuthService;
 import org.ltt204.identityservice.service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
+    AuthService authService;
 
     @PostMapping
     ResponseEntity<ApplicationResponseDto<UserDto>> createUser(@Valid @RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {
@@ -77,12 +79,5 @@ public class UserController {
     ResponseEntity<Void> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/logout")
-    ResponseEntity<ApplicationResponseDto<?>> logout() {
-        userService.logout();
-
-        return ResponseEntity.ok(ApplicationResponseDto.success());
     }
 }

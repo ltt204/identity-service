@@ -1,7 +1,5 @@
 package org.ltt204.identityservice.service;
 
-import com.nimbusds.jwt.SignedJWT;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,16 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.dto.request.user.UserCreateRequestDto;
 import org.ltt204.identityservice.dto.request.user.UserUpdateRequestDto;
 import org.ltt204.identityservice.dto.response.user.UserDto;
-import org.ltt204.identityservice.entity.LoggedOutToken;
 import org.ltt204.identityservice.entity.Role;
 import org.ltt204.identityservice.entity.User;
 import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
 import org.ltt204.identityservice.mapper.UserMapper;
-import org.ltt204.identityservice.repository.LoggedOutTokenRepository;
 import org.ltt204.identityservice.repository.RoleRepository;
 import org.ltt204.identityservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.HashSet;
 
 @Slf4j
@@ -40,11 +33,8 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserService {
-    HttpServletRequest request;
-
     UserRepository userRepository;
     RoleRepository roleRepository;
-    LoggedOutTokenRepository loggedOutTokenRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -136,28 +126,5 @@ public class UserService {
         });
         userRepository.delete(user);
     }
-
-    public void logout() {
-        var authHeader = request.getHeader("Authorization");
-        var accessToken = authHeader.substring(7);
-        Date expirationTime;
-        log.info(accessToken);
-
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(accessToken);
-            expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        var loggedOutToken = LoggedOutToken
-                .builder()
-                .token(accessToken)
-                .expirationTime(expirationTime)
-                .build();
-
-        loggedOutTokenRepository.save(loggedOutToken);
-    }
-
 
 }

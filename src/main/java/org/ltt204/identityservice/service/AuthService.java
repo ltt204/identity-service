@@ -1,48 +1,37 @@
 package org.ltt204.identityservice.service;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.ltt204.identityservice.dto.request.token.TokenIntrospectRequestDto;
+import org.ltt204.identityservice.dto.request.auth.LogoutRequestDto;
+import org.ltt204.identityservice.dto.request.auth.RevokeTokenRequestDto;
+import org.ltt204.identityservice.dto.request.auth.TokenIntrospectRequestDto;
 import org.ltt204.identityservice.dto.request.user.UserSignInRequestDto;
 import org.ltt204.identityservice.dto.response.auth.AuthenticationResponseDto;
 import org.ltt204.identityservice.dto.response.auth.IntrospectResponseDto;
-import org.ltt204.identityservice.entity.User;
+import org.ltt204.identityservice.dto.response.auth.RevokeTokenResponseDto;
+import org.ltt204.identityservice.entity.InvalidatedToken;
 import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
+import org.ltt204.identityservice.repository.InvalidatedTokenRepository;
 import org.ltt204.identityservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
 
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AuthService {
+    HttpServletRequest httpRequest;
 
-    @NonFinal
-    @Value("${jwt.signerKey}")
-    String ACCESS_TOKEN_SIGNER_KEY;
-    @NonFinal
-    @Value("${jwt.valid-duration}")
-    long VALID_DURATION;
-
-
+    InvalidatedTokenRepository invalidatedTokenRepository;
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
 
@@ -67,15 +56,65 @@ public class AuthService {
             return new AppException(error);
         });
 
-        var token = tokenService.generateToken(user);
+        var accessToken = tokenService.generateAccessToken(user);
+        var refreshToken = tokenService.generateRefreshToken(user);
 
         if (passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             return AuthenticationResponseDto.builder()
                     .authenticated(true)
-                    .token(token)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
                     .build();
         }
 
         throw new AppException(ErrorCode.UNAUTHENTICATED);
+    }
+
+    public RevokeTokenResponseDto revokeToken(RevokeTokenRequestDto revokeTokenRequestDto) throws ParseException, JOSEException {
+        var accessToken = revokeTokenRequestDto.getAccessToken();
+        var refreshToken = revokeTokenRequestDto.getRefreshToken();
+        var isValid = tokenService.isValid(refreshToken);
+
+        if (!isValid) {
+            var error = ErrorCode.UNAUTHORIZED;
+            error.setMessage("Token is invalid");
+            throw new AppException(error);
+        }
+
+        var username = SignedJWT.parse(accessToken).getJWTClaimsSet().getSubject();
+        log.info(String.valueOf(username));
+        var user = userRepository.findFirstByUsername(String.valueOf(username)).orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND));
+
+        // Invalidate refresh and access token
+        logout(LogoutRequestDto.builder().refreshToken(refreshToken).accessToken(accessToken).build());
+
+        return RevokeTokenResponseDto.builder()
+                .accessToken(tokenService.generateAccessToken(user))
+                .refreshToken(tokenService.generateRefreshToken(user))
+                .build();
+    }
+
+    public void logout(LogoutRequestDto logoutRequestDto) {
+        var accessToken = logoutRequestDto.getAccessToken();
+        var refreshToken = logoutRequestDto.getRefreshToken();
+
+        invalidateToken(accessToken);
+        invalidateToken(refreshToken);
+    }
+
+    private void invalidateToken(String token) {
+        InvalidatedToken invalidateRefreshToken;
+
+        try {
+            invalidateRefreshToken = InvalidatedToken
+                    .builder()
+                    .token(token)
+                    .expirationTime(SignedJWT.parse(token).getJWTClaimsSet().getExpirationTime())
+                    .build();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        invalidatedTokenRepository.save(invalidateRefreshToken);
     }
 }
