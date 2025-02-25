@@ -54,7 +54,8 @@ public class UserService {
         roles.add(roleRepository.findByName(DEFAULT_ROLE));
 
         user.setRoles(roles);
-        userRepository.save(user);
+        user = userRepository.save(user);
+        log.info("userid: {}", user.getId());
         return userMapper.toUserDto(user);
     }
 

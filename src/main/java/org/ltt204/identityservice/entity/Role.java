@@ -26,6 +26,8 @@ public class Role {
             generator = "role_sequence"
     )
     int id;
+
+    @Column(name = "name", unique = true)  // Add unique constraint
     String name;
     String description;
 
