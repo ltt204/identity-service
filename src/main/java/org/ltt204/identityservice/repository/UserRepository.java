@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+//@Repository
 public interface UserRepository extends JpaRepository<User, String>, PagingAndSortingRepository<User, String> {
     boolean existsUsersByUsername(String username);
 

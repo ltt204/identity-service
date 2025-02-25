@@ -33,7 +33,7 @@ public class ApplicationInitConfig {
                         .build());
 
                 HashSet<Role> roles = new HashSet<>();
-                roles.add(roleRepository.findByName("ADMIN"));
+                roles.add(roleRepository.findFirstByName("ADMIN"));
 
                 User admin = User.builder()
                         .username("admin")

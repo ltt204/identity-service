@@ -23,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-    AuthService authService;
 
     @PostMapping
     ResponseEntity<ApplicationResponseDto<UserDto>> createUser(@Valid @RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {

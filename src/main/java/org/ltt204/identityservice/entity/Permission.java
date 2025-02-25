@@ -23,6 +23,7 @@ public class Permission {
             generator = "permission_sequence"
     )
     int id;
+    @Column(name = "name", unique = true)  // Add unique constraint
     String name;
     String description;
 }
