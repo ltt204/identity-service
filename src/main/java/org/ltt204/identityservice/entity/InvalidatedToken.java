@@ -15,7 +15,6 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class InvalidatedToken {
     @Id
     String token;
