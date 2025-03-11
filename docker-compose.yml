@@ -1,11 +1,18 @@
 services:
   identity-db:
-    image: postgresql:alpine
+    image: mysql
     environment:
-      POSTGRES_DB: identity
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      MYSQL_DATABASE: identity-db
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "5432:5432"
-    volumes:
-      - identity-db-data:/var/lib/postgresql/data
+      - '3306:3306'
+  invalidated-token-db:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+  redis-insight:
+    image: redis/redisinsight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"

@@ -14,7 +14,7 @@ public enum ErrorCode {
     UNCATEGORIZED(9999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
     // 1xxx
     INVALID_ERROR_KEY(1001, "Invalid error key", HttpStatus.INTERNAL_SERVER_ERROR),
-
+    INVALID_TOKEN_FORMAT(1002, "Invalid token format", HttpStatus.BAD_REQUEST),
     // 2xxx
     FIRSTNAME_REQUIRED(2000, "Firstname is required", HttpStatus.BAD_REQUEST),
     LASTNAME_REQUIRED(2001, "Lastname is required", HttpStatus.BAD_REQUEST),
