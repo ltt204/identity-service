@@ -33,38 +33,36 @@ This identity service provides comprehensive user authentication and management 
 - MySQL workbench
 
 ## Setup Instructions
-1. Clone the repository:
-
-```
-git clone https://github.com/ltt204/identity-service.git
-cd identity-service
-```
+1. Clone the repository:    
+    ```
+    git clone https://github.com/ltt204/identity-service.git
+    cd identity-service
+    ```
 
 2. Start the PostgreSQL database using Docker Compose:
-
-``` 
-docker compose up -d
-```
+    ``` 
+    docker compose up -d
+    ```
 
 3. In MySQL workbench, connect to database service at "localhost:3306".
 
 4. Initialize the database schema: Navigate to `src/main/resources/db/migration` and execute all SQL files to set up the database structure in MySQL workbench.
 
 5. Build and run the application:
-```
-./gradlew bootRun
-```
+    ```
+    ./gradlew bootRun
+    ```
 
 6. The application will be available at:
-```
-http://localhost:8080/identity
-```
+    ```
+    http://localhost:8080/identity
+    ```
 
 7. You can use RedisInsight at `172.19.0.4:5540`.
-> Note: The IP address might be different, you can check it in terminal with:
->  ```bash
->  docker inspect [container id] | grep IPAddress
->  ```
+    > Note: The IP address might be different, you can check it in terminal with:
+    >  ```bash
+    >  docker inspect [container id] | grep IPAddress
+    >  ```
 
 
 ## API Documentation 
