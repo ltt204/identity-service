@@ -9,9 +9,9 @@ logging:
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/identity_service"
+    url: "jdbc:mysql://localhost:3306/identity-db"
     username: "root"
-    password: "12022004"
+    password: "root"
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,3 +22,8 @@ jwt:
     refresh-signer-key: "7+78pvfH7Pp4WK8py2tecwSfH+Cvt56WKuWNEDOmqsEaiDwjWh2wBI56+gTMMy9S"
     valid-duration: 3600 # in second
     refreshable-duration: 360000 # in second
+    revoked-token-prefix: 'revoked_token:'
+
+redis:
+  host: "127.0.0.1"
+  port: "6379"
