@@ -2,10 +2,10 @@ package org.ltt204.identityservice.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.dto.request.auth.LogoutRequestDto;
 import org.ltt204.identityservice.dto.request.auth.RevokeTokenRequestDto;
@@ -17,8 +17,9 @@ import org.ltt204.identityservice.dto.response.auth.RevokeTokenResponseDto;
 import org.ltt204.identityservice.entity.InvalidatedToken;
 import org.ltt204.identityservice.exception.AppException;
 import org.ltt204.identityservice.exception.ErrorCode;
-import org.ltt204.identityservice.repository.InvalidatedTokenRepository;
 import org.ltt204.identityservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,12 +30,11 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AuthService {
-    HttpServletRequest httpRequest;
-
-    InvalidatedTokenRepository invalidatedTokenRepository;
+    //    InvalidatedTokenRepository invalidatedTokenRepository;
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
-
+    //    UnifiedJedis unifiedJedis;
+    RedisTemplate<String, String> redisTemplate;
     TokenService tokenService;
 
     public IntrospectResponseDto introspect(TokenIntrospectRequestDto introspectRequestDto) {
@@ -98,23 +98,7 @@ public class AuthService {
         var accessToken = logoutRequestDto.getAccessToken();
         var refreshToken = logoutRequestDto.getRefreshToken();
 
-        invalidateToken(accessToken);
-        invalidateToken(refreshToken);
-    }
-
-    private void invalidateToken(String token) {
-        InvalidatedToken invalidateRefreshToken;
-
-        try {
-            invalidateRefreshToken = InvalidatedToken
-                    .builder()
-                    .token(token)
-                    .expirationTime(SignedJWT.parse(token).getJWTClaimsSet().getExpirationTime())
-                    .build();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        invalidatedTokenRepository.save(invalidateRefreshToken);
+        tokenService.invalidateToken(accessToken);
+        tokenService.invalidateToken(refreshToken);
     }
 }

@@ -8,40 +8,42 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.ltt204.identityservice.entity.InvalidatedToken;
 import org.ltt204.identityservice.entity.User;
-import org.ltt204.identityservice.repository.InvalidatedTokenRepository;
+import org.ltt204.identityservice.exception.AppException;
+import org.ltt204.identityservice.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class TokenService {
-    InvalidatedTokenRepository invalidatedTokenRepository;
-
-    @NonFinal
+    @Value("${jwt.revoked-token-prefix}")
+    String prefixRevokedToken;
     @Value("${jwt.signer-key}")
     String ACCESS_TOKEN_SIGNER_KEY;
-    @NonFinal
     @Value("${jwt.refreshable-duration}")
     long VALID_DURATION;
-
-    @NonFinal
     @Value("${jwt.refresh-signer-key}")
     String REFRESH_TOKEN_SIGNER_KEY;
-    @NonFinal
     @Value("${jwt.valid-duration}")
     long REFRESHABLE_DURATION;
+
+    final RedisTemplate<String, String> redisTemplate;
+
 
     public boolean isValid(String token) throws JOSEException, ParseException {
         JWSVerifier jwsAccessVerifier = new MACVerifier(ACCESS_TOKEN_SIGNER_KEY.getBytes());
@@ -54,7 +56,8 @@ public class TokenService {
     }
 
     public boolean isInBlacklist(String token) {
-        return !invalidatedTokenRepository.findByToken(token).isEmpty();
+        var key = prefixRevokedToken + token;
+        return redisTemplate.hasKey(key);
     }
 
     public String generateAccessToken(User user) {
@@ -86,6 +89,31 @@ public class TokenService {
                 .build();
 
         return getPayload(header, claimsSet, REFRESH_TOKEN_SIGNER_KEY);
+    }
+
+    public void invalidateToken(String token) {
+        InvalidatedToken invalidatedToken;
+
+        try {
+            invalidatedToken = InvalidatedToken
+                    .builder()
+                    .token(token)
+                    .expirationTime(SignedJWT.parse(token).getJWTClaimsSet().getExpirationTime())
+                    .build();
+        } catch (ParseException e) {
+            throw new AppException(
+                    ErrorCode.INVALID_TOKEN_FORMAT
+            );
+        }
+
+        if (invalidatedToken.getExpirationTime().before(new Date())) {
+            return; // Token is already expired
+        }
+
+        var key = prefixRevokedToken + invalidatedToken.getToken();
+        log.info("Key: {}", key);
+        redisTemplate.opsForValue().set(key, String.valueOf(new Date()));
+        redisTemplate.expire(key, invalidatedToken.getExpirationTime().getTime() - System.currentTimeMillis(), TimeUnit.MICROSECONDS);
     }
 
     private String buildScope(User user) {
