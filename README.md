@@ -84,17 +84,22 @@ http://localhost:8080/identity
 
 - Error code:
 
-    Error Code|	Name|	Message|	HTTP Status|
-    ---|---|---|---|
-    9999|	UNCATEGORIZED|	Uncategorized exception|	500 INTERNAL_SERVER_ERROR|
-    1xxx|	System Errors	|	||
-    1001|	INVALID_ERROR_KEY|	Invalid error key|	500 INTERNAL_SERVER_ERROR
-    1002|	INVALID_TOKEN_FORMAT|	Invalid token format|	400 BAD_REQUEST
-    2xxx	|Validation Errors |||	
-    2000|	FIRSTNAME_REQUIRED|	Firstname is required|	400 BAD_REQUEST|
-    2001|	LASTNAME_REQUIRED|	Lastname is required|	400 BAD_REQUEST|
-    2002|	INVALID_USERNAME|	Username must be at least {min} characters|	400 BAD_REQUEST|
-
+    Error Code|	Name|	Message|
+    ---|---|---|
+    9999|	UNCATEGORIZED|	Uncategorized exception|
+    _1xxx_|	System Errors	|	||
+    1001|	INVALID_ERROR_KEY|	Invalid error key|
+    1002|	INVALID_TOKEN_FORMAT|	Invalid token format|
+    _2xxx_	|Validation Errors |||	
+    2000|	FIRSTNAME_REQUIRED|	Firstname is required||
+    2001|	LASTNAME_REQUIRED|	Lastname is required|	
+    2002|	INVALID_USERNAME|	Username must be at least {min} characters|	
+    _3xxx_|   User errors |||	
+    3000|	CONFLICT|	Resource already existed|
+    3001|	NOT_FOUND|	Resource not found|
+    _4xxx_|   Auth errors |||
+    4000|	UNAUTHENTICATED|	Username must be at least {min} characters|
+    4001|	UNAUTHORIZED|	Username must be at least {min} characters|
 ## Configuration
 The application uses the following configuration:
 
