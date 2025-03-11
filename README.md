@@ -98,8 +98,8 @@ http://localhost:8080/identity
     3000|	CONFLICT|	Resource already existed|
     3001|	NOT_FOUND|	Resource not found|
     _4xxx_|   Auth errors |||
-    4000|	UNAUTHENTICATED|	Username must be at least {min} characters|
-    4001|	UNAUTHORIZED|	Username must be at least {min} characters|
+    4000|	UNAUTHENTICATED|	Unauthenticated|
+    4001|	UNAUTHORIZED|	You are not authorized for this action|
 ## Configuration
 The application uses the following configuration:
 
