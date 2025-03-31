@@ -1,8 +1,9 @@
 # Identity Service
-This identity service provides comprehensive user authentication and management capabilities using JWT 2.0 and Refresh Token Rotation.
+This identity service provides comprehensive jpaUser authentication and management capabilities using JWT 2.0 and Refresh Token Rotation.
 
 ## Table of Contents
 - [Features](#features)
+- [Architecture](#architecture)
 - [Technology Stack](#technology-stack)
 - [Prerequisites](#prerequisites)
 - [Setup Instructions](#setup-instructions)
@@ -18,6 +19,46 @@ This identity service provides comprehensive user authentication and management 
 - Token management with Refresh Token Rotation technique
 - Role-based access control
 
+## Architecture
+
+This project follows Clean Architecture principles with the following layers:
+
+### Domain Layer (Core)
+- Contains enterprise business rules and entities
+- Has no dependencies on outer layers
+- Located in `src/main/java/org/ltt204/identityservice/domain/`
+  - `entities/` - Core domain models
+  - `repositories/` - Repository interfaces
+  - `services/` - Domain service interfaces
+
+### Application Layer
+- Contains application-specific business rules
+- Orchestrates the flow of data between domain entities and outer layers
+- Located in `src/main/java/org/ltt204/identityservice/application/`
+  - `ports/` - Input and output ports (interfaces)
+  - `services/` - Use case implementations
+  - `dtos/` - Data Transfer Objects for application layer
+  - `repositories/` - Repository adapters implementing domain interfaces
+
+### Infrastructure Layer
+- Contains frameworks, drivers, and tools
+- Implements interfaces defined in inner layers
+- Located in `src/main/java/org/ltt204/identityservice/infra/`
+  - `persist/` - Database implementation
+    - `jpa/` - JPA entities and repositories
+    - `mappers/` - Entity mappers
+  - `security/` - Security configurations
+  - `config/` - Other configurations
+
+### Presentation Layer
+- Contains UI or API controllers
+- Presents data to the user and handles input
+- Located in `src/main/java/org/ltt204/identityservice/presentations/`
+  - `web/` - Web controllers
+  - `dtos/` - Request and response DTOs
+  - `mappers/` - Mappers between DTOs and application models
+  - `advices/` - Exception handlers
+
 ## Technology Stack
 - Java
 - Spring Boot
@@ -28,7 +69,7 @@ This identity service provides comprehensive user authentication and management 
 - Redis
 
 ## Prerequisites
-- JDK 11 or higher
+- JDK 17 or higher
 - Docker and Docker Compose
 - MySQL workbench
 
@@ -61,43 +102,43 @@ This identity service provides comprehensive user authentication and management 
 7. You can use RedisInsight at `172.19.0.4:5540`.
     > Note: The IP address might be different, you can check it in terminal with:
     >  ```bash
-    >  docker inspect [container id] | grep IPAddress
+    >  docker inspect [redis container id] | grep IPAddress
     >  ```
 
 
 ## API Documentation 
-- With Postman, [here](https://web.postman.co/workspace/My-Workspace~c548a04e-af06-4da2-893c-6d798885d848/collection/38352708-d661f49f-f537-40f6-bbac-ff86302da1a1?action=share&source=copy-link&creator=38352708&active-environment=dafc7c87-238c-434b-93a1-89aaa98c0047).
-- Available endpoints.
+### Available Endpoints
+|Endpoint |	Method	| Description	| Required Role|
+|---|---|---|---|
+`/identity/auth/login`|	POST|	User login	|None|
+`/identity/auth/register`|	POST|	User registration	|None|
+`/identity/auth/refresh`|	POST|	Refresh access token	|None|
+`/identity/auth/logout`|	POST|	User logout	|User|
+`/identity/users`	|GET|	List all users	|Admin|
+`/identity/users/{id}`	|GET|	Get jpaUser details	|Admin|
+`/identity/users/{id}`	|PUT|	Update jpaUser	|Admin|
+`/identity/users/{id}`	|DELETE|	Delete jpaUser	|Admin|
 
-    |Endpoint |	Method	| Description	| Required Role|
-    |---|---|---|---|
-    /identity/auth/login|	POST|	User login	|None|
-    /identity/auth/register|	POST|	User registration	|None|
-    /identity/auth/refresh|	POST|	Refresh access token	|None|
-    /identity/auth/logout|	POST|	User logout	|User|
-    /identity/users	|GET|	List all users	|Admin|
-    /identity/users/{id}	|GET|	Get user details	|Admin|
-    /identity/users/{id}	|PUT|	Update user	|Admin|
-    /identity/users/{id}	|DELETE|	Delete user	|Admin|
+- [Postman Documentation](https://documenter.getpostman.com/view/38352708/2sB2cRBP58).
 
-- Error code:
+### Error code:
+Error Code|	Name|	Message|
+---|---|---|
+9999|	UNCATEGORIZED|	Uncategorized exception|
+_1xxx_|	System Errors	|	||
+1001|	INVALID_ERROR_KEY|	Invalid error key|
+1002|	INVALID_TOKEN_FORMAT|	Invalid token format|
+_2xxx_	|**Validation Errors** |||	
+2000|	FIRSTNAME_REQUIRED|	Firstname is required||
+2001|	LASTNAME_REQUIRED|	Lastname is required|	
+2002|	INVALID_USERNAME|	Username must be at least {min} characters|	
+_3xxx_|   **User errors** |||	
+3000|	CONFLICT|	Resource already existed|
+3001|	NOT_FOUND|	Resource not found|
+_4xxx_|   **Auth errors** |||
+4000|	UNAUTHENTICATED|	Unauthenticated|
+4001|	UNAUTHORIZED|	You are not authorized for this action|
 
-    Error Code|	Name|	Message|
-    ---|---|---|
-    9999|	UNCATEGORIZED|	Uncategorized exception|
-    _1xxx_|	System Errors	|	||
-    1001|	INVALID_ERROR_KEY|	Invalid error key|
-    1002|	INVALID_TOKEN_FORMAT|	Invalid token format|
-    _2xxx_	|Validation Errors |||	
-    2000|	FIRSTNAME_REQUIRED|	Firstname is required||
-    2001|	LASTNAME_REQUIRED|	Lastname is required|	
-    2002|	INVALID_USERNAME|	Username must be at least {min} characters|	
-    _3xxx_|   User errors |||	
-    3000|	CONFLICT|	Resource already existed|
-    3001|	NOT_FOUND|	Resource not found|
-    _4xxx_|   Auth errors |||
-    4000|	UNAUTHENTICATED|	Unauthenticated|
-    4001|	UNAUTHORIZED|	You are not authorized for this action|
 ## Configuration
 The application uses the following configuration:
 

@@ -1,4 +1,4 @@
-CREATE TABLE user
+CREATE TABLE jpaUser
 (
     id            VARCHAR(255) NOT NULL,
     username      VARCHAR(255) NULL,
@@ -20,7 +20,7 @@ ALTER TABLE `role`
     ADD CONSTRAINT uc_role_name UNIQUE (name);
 
 
-CREATE TABLE permission
+CREATE TABLE jpaPermission
 (
     id            INT          NOT NULL,
     name          VARCHAR(255) NULL,
@@ -28,7 +28,7 @@ CREATE TABLE permission
     CONSTRAINT pk_permission PRIMARY KEY (id)
 );
 
-ALTER TABLE permission
+ALTER TABLE jpaPermission
     ADD CONSTRAINT uc_permission_name UNIQUE (name);
 
 CREATE TABLE user_roles
@@ -42,7 +42,7 @@ ALTER TABLE user_roles
     ADD CONSTRAINT fk_userol_on_role FOREIGN KEY (roles_id) REFERENCES `role` (id);
 
 ALTER TABLE user_roles
-    ADD CONSTRAINT fk_userol_on_user FOREIGN KEY (user_id) REFERENCES user (id);
+    ADD CONSTRAINT fk_userol_on_user FOREIGN KEY (user_id) REFERENCES jpaUser (id);
 
 CREATE TABLE role_permissions
 (
@@ -52,7 +52,7 @@ CREATE TABLE role_permissions
 );
 
 ALTER TABLE role_permissions
-    ADD CONSTRAINT fk_rolper_on_permission FOREIGN KEY (permissions_id) REFERENCES permission (id);
+    ADD CONSTRAINT fk_rolper_on_permission FOREIGN KEY (permissions_id) REFERENCES jpaPermission (id);
 
 ALTER TABLE role_permissions
     ADD CONSTRAINT fk_rolper_on_role FOREIGN KEY (role_id) REFERENCES `role` (id);
