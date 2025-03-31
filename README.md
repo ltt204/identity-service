@@ -1,5 +1,5 @@
 # Identity Service
-This identity service provides comprehensive user authentication and management capabilities using JWT 2.0 and Refresh Token Rotation.
+This identity service provides comprehensive jpaUser authentication and management capabilities using JWT 2.0 and Refresh Token Rotation.
 
 ## Table of Contents
 - [Features](#features)
@@ -61,7 +61,7 @@ This identity service provides comprehensive user authentication and management 
 7. You can use RedisInsight at `172.19.0.4:5540`.
     > Note: The IP address might be different, you can check it in terminal with:
     >  ```bash
-    >  docker inspect [container id] | grep IPAddress
+    >  docker inspect [redis container id] | grep IPAddress
     >  ```
 
 
@@ -76,9 +76,9 @@ This identity service provides comprehensive user authentication and management 
     /identity/auth/refresh|	POST|	Refresh access token	|None|
     /identity/auth/logout|	POST|	User logout	|User|
     /identity/users	|GET|	List all users	|Admin|
-    /identity/users/{id}	|GET|	Get user details	|Admin|
-    /identity/users/{id}	|PUT|	Update user	|Admin|
-    /identity/users/{id}	|DELETE|	Delete user	|Admin|
+    /identity/users/{id}	|GET|	Get jpaUser details	|Admin|
+    /identity/users/{id}	|PUT|	Update jpaUser	|Admin|
+    /identity/users/{id}	|DELETE|	Delete jpaUser	|Admin|
 
 - Error code:
 
