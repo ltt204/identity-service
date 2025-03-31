@@ -74,6 +74,8 @@ public class RoleService implements IRoleService {
 
         role.setPermissions(new HashSet<>(permissions));
 
-        return save(newRole);
+        return roleRepository.save(
+            roleEntityMapper.toDomainEntity(newRole)
+        );
     }
 }

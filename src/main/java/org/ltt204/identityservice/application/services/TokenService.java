@@ -141,7 +141,7 @@ public class TokenService implements ITokenService {
         log.info("Redis key: {}", key);
 
         redisTemplate.opsForValue().set(key, String.valueOf(new Date()));
-        redisTemplate.expire(key, jpaInvalidatedToken.getExpirationTime().getTime() - System.currentTimeMillis(), TimeUnit.MICROSECONDS);
+        redisTemplate.expire(key, jpaInvalidatedToken.getExpirationTime().getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
     private String buildScope(User user) {
