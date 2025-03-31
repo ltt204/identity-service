@@ -1,5 +1,10 @@
 # Identity Service
-This identity service provides comprehensive jpaUser authentication and management capabilities using JWT 2.0 and Refresh Token Rotation.
+
+A robust, secure authentication and authorization system built with Clean Architecture principles. This identity service implements JWT 2.0 authentication with Refresh Token Rotation, comprehensive user management, and fine-grained role-based access control.
+
+The project demonstrates best practices in software architecture by strictly separating concerns into independent layers (domain, application, infrastructure, and presentation) while maintaining a rich feature set including token blacklisting with Redis, comprehensive user administration, and sophisticated permission management.
+
+Built with Java 17, Spring Boot, and modern security practices, this project serves as both a practical microservice component and a reference implementation of Clean Architecture in a security-focused application.
 
 ## Table of Contents
 - [Features](#features)
