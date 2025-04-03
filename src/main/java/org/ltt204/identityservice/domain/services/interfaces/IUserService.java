@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.domain.services;
+package org.ltt204.identityservice.domain.services.interfaces;
 
 import org.ltt204.identityservice.application.dtos.user.UserDto;
 import org.ltt204.identityservice.domain.entities.User;

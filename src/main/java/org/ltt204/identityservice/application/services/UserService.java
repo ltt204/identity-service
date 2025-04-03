@@ -6,11 +6,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.application.dtos.user.UserDto;
 import org.ltt204.identityservice.domain.entities.User;
+import org.ltt204.identityservice.domain.events.UserCreatedEvent;
+import org.ltt204.identityservice.domain.events.UserDeletedEvent;
+import org.ltt204.identityservice.domain.events.UserUpdatedEvent;
 import org.ltt204.identityservice.domain.repositories.IUserRepository;
-import org.ltt204.identityservice.domain.services.IUserService;
+import org.ltt204.identityservice.domain.services.interfaces.IUserService;
+import org.ltt204.identityservice.infra.messaging.RabbitMQEventPublisher;
 import org.ltt204.identityservice.infra.persist.mappers.UserEntityMapper;
-import org.ltt204.identityservice.presentations.web.advices.AppException;
-import org.ltt204.identityservice.presentations.web.advices.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -18,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -27,11 +31,25 @@ public class UserService implements IUserService {
     IUserRepository userRepository;
     UserEntityMapper userEntityMapper;
     PasswordEncoder passwordEncoder;
+    RabbitMQEventPublisher eventPublisher;
 
     @Override
     public UserDto create(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userEntityMapper.toDto(userRepository.save(user));
+
+        user = userRepository.save(user);
+        var userCreatedEvent = UserCreatedEvent.builder()
+                .userId(user.getId())
+                .eventType(UserCreatedEvent.EVENT_TYPE)
+                .timeStamp(LocalDateTime.now())
+                .username(user.getUsername())
+                .firstname(user.getFirstName())
+                .lastname(user.getLastName())
+                .build();
+
+        eventPublisher.publishEvent(userCreatedEvent);
+
+        return userEntityMapper.toDto(user);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -74,7 +92,16 @@ public class UserService implements IUserService {
 
         userEntityMapper.toEntityFromUpdateRequest(currentUser, user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        var userUpdatedEvent = UserUpdatedEvent.builder()
+                .userId(user.getId())
+                .eventType(UserCreatedEvent.EVENT_TYPE)
+                .timeStamp(LocalDateTime.now())
+                .username(user.getUsername())
+                .build();
+
+        eventPublisher.publishEvent(userUpdatedEvent);
 
         return userEntityMapper.toDto(user);
     }
@@ -84,6 +111,14 @@ public class UserService implements IUserService {
         var user = userRepository.findById(userId);
 
         userRepository.delete(user);
+
+        var userDeletedEvent = UserDeletedEvent.builder()
+                .userId(user.getId())
+                .eventType(UserCreatedEvent.EVENT_TYPE)
+                .timeStamp(LocalDateTime.now())
+                .build();
+
+        eventPublisher.publishEvent(userDeletedEvent);
     }
 
 }

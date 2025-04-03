@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.domain.entities.Permission;
 import org.ltt204.identityservice.domain.entities.User;
 import org.ltt204.identityservice.domain.repositories.IPermissionRepository;
-import org.ltt204.identityservice.domain.services.IPermissionService;
+import org.ltt204.identityservice.domain.services.interfaces.IPermissionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
