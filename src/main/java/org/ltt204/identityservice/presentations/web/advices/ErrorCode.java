@@ -13,8 +13,11 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     UNCATEGORIZED(9999, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
     // 1xxx
+    INTERNAL_SERVER_ERROR(1000, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_ERROR_KEY(1001, "Invalid error key", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_TOKEN_FORMAT(1002, "Invalid token format", HttpStatus.BAD_REQUEST),
+    RABBITMQ_PUBLISHING_ERROR(1003, "Error while publishing event to RabbitMQ", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 2xxx
     FIRSTNAME_REQUIRED(2000, "Firstname is required", HttpStatus.BAD_REQUEST),
     LASTNAME_REQUIRED(2001, "Lastname is required", HttpStatus.BAD_REQUEST),

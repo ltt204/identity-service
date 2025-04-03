@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.ltt204.identityservice.domain.services.IAuthService;
+import org.ltt204.identityservice.domain.services.interfaces.IAuthService;
 import org.ltt204.identityservice.presentations.web.dtos.requests.auth.LogoutRequestDto;
 import org.ltt204.identityservice.presentations.web.dtos.requests.auth.RevokeTokenRequestDto;
 import org.ltt204.identityservice.presentations.web.dtos.requests.auth.TokenIntrospectRequestDto;

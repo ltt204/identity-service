@@ -1,9 +1,8 @@
-package org.ltt204.identityservice.domain.services;
+package org.ltt204.identityservice.domain.services.interfaces;
 
 import org.ltt204.identityservice.application.dtos.role.RoleDto;
 import org.ltt204.identityservice.domain.entities.Role;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IRoleService {

@@ -1,4 +1,4 @@
-package org.ltt204.identityservice.domain.services;
+package org.ltt204.identityservice.domain.services.interfaces;
 
 import com.nimbusds.jose.JOSEException;
 import org.ltt204.identityservice.domain.entities.User;

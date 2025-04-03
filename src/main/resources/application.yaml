@@ -16,6 +16,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 jwt:
     signer-key: "x1GTfAdnglz/9+9bO9Ya615tMoqNFsdQSUQXolWa5CW3jHaFLQIWoguaoD+GlhPp"
@@ -31,3 +36,11 @@ redis:
 app:
   security:
     default-role: USER
+
+service:
+  domain: identity
+  name: identity-service
+  event:
+    created: created
+    updated: updated
+    deleted: deleted

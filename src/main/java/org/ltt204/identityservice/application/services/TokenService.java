@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.ltt204.identityservice.domain.entities.User;
-import org.ltt204.identityservice.domain.services.ITokenService;
+import org.ltt204.identityservice.domain.services.interfaces.ITokenService;
 import org.ltt204.identityservice.infra.persist.jpa.entities.JpaInvalidatedToken;
 import org.ltt204.identityservice.presentations.web.advices.AppException;
 import org.ltt204.identityservice.presentations.web.advices.ErrorCode;
