@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.ltt204.identityservice.application.services.UserService;
 import org.ltt204.identityservice.domain.entities.User;
+import org.ltt204.identityservice.domain.events.UserCreatedEvent;
+import org.ltt204.identityservice.infra.messaging.RabbitMQEventPublisher;
 import org.ltt204.identityservice.infra.persist.jpa.entities.JpaUser;
 import org.ltt204.identityservice.presentations.web.dtos.requests.user.UserCreateRequestDto;
 import org.ltt204.identityservice.presentations.web.advices.AppException;
@@ -11,6 +13,8 @@ import org.ltt204.identityservice.infra.persist.jpa.repositories.JpaRoleReposito
 import org.ltt204.identityservice.infra.persist.jpa.repositories.JpaUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
@@ -19,9 +23,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@TestPropertySource(value = "/application-test.properties")
 class JpaUserServiceTest {
     @Autowired
     private UserService userService;
@@ -30,6 +36,8 @@ class JpaUserServiceTest {
     private JpaUserRepository userRepository;
     @MockitoBean
     private JpaRoleRepository jpaRoleRepository;
+    @MockitoBean
+    private RabbitMQEventPublisher rabbitMQEventPublisher;
 
     private User userCreateRequestDto;
     private JpaUser user;
@@ -59,6 +67,8 @@ class JpaUserServiceTest {
         // GIVEN
         when(userRepository.existsUsersByUsername(anyString())).thenReturn(false);
         when(userRepository.save(any())).thenReturn(user);
+
+        doNothing().when(rabbitMQEventPublisher).publishEvent(UserCreatedEvent.builder().build());
 
         // WHEN
         var response = userService.create(userCreateRequestDto);
