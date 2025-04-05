@@ -106,4 +106,9 @@ public class UserRepositoryAdapter implements IUserRepository {
     public boolean existsById(String id) {
         return jpaUserRepository.existsById(id);
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return jpaUserRepository.existsUsersByUsername(name);
+    }
 }
