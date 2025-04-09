@@ -16,16 +16,3 @@ services:
     restart: unless-stopped
     ports:
       - "5540:5540"
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - '15672:15672'
-      - '5672:5672'
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-
-volumes:
-  rabbitmq-data:

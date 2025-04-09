@@ -17,6 +17,9 @@ public class ApplicationResponseDto<T> {
     long code = 1000;
     String message;
 
+    @Builder.Default
+    boolean success = true;
+
     @Nullable
     T content;
 
@@ -50,6 +53,7 @@ public class ApplicationResponseDto<T> {
     public static <T> ApplicationResponseDto<T> failure(ErrorCode exception) {
         return ApplicationResponseDto.<T>builder()
                 .code(exception.getCode())
+                .success(false)
                 .message(exception.getMessage())
                 .build();
     }

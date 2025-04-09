@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, "/auth/**", "/users").permitAll()
+                request.requestMatchers(HttpMethod.POST,"/public/**" ,"/auth/**", "/users").permitAll()
                         .anyRequest().authenticated()
         );
 
