@@ -29,7 +29,7 @@ public class UserController {
     RoleService roleService;
     UserMapper userMapper;
 
-    @PostMapping
+    @PostMapping("/signup")
     ResponseEntity<ApplicationResponseDto<UserDto>> createUser(@Valid @RequestBody UserCreateRequestDto requestDto, UriComponentsBuilder ucb) {
         var createdUser = userService.create(
                 userMapper.toDomainEntity(requestDto)
