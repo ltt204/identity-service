@@ -39,7 +39,7 @@ public class RoleService implements IRoleService {
         );
 
         if (permissions.isEmpty()) {
-            throw new AppException(ErrorCode.NOT_FOUND.withMessage("No permissions found"));
+            throw new AppException(ErrorCode.NOT_FOUND, "No permissions found");
         }
 
         var roleEntity = roleEntityMapper.toDomainEntity(role);

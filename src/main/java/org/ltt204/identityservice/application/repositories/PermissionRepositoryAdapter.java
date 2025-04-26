@@ -25,7 +25,7 @@ public class PermissionRepositoryAdapter implements IPermissionRepository {
     @Override
     public Permission findById(int id) {
         var appEntity = jpaPermissionRepository.findById(id).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND.withMessage("Permission not found"))
+                () -> new AppException(ErrorCode.NOT_FOUND, "Permission not found")
         );
         return permissionEntityMapper.toDomainEntity(appEntity);
     }

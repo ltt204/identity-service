@@ -37,7 +37,7 @@ public class UserRepositoryAdapter implements IUserRepository {
     @Override
     public User findById(String id) {
         var jpaUser = jpaUserRepository.findById(id).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"))
+                () -> new AppException(ErrorCode.NOT_FOUND,"User not found")
         );
 
         return userEntityMapper.toDomainEntity(jpaUser);
@@ -46,7 +46,7 @@ public class UserRepositoryAdapter implements IUserRepository {
     @Override
     public User findFirstByUserName(String name) {
         var jpaUser = jpaUserRepository.findFirstByUsername(name).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"))
+                () -> new AppException(ErrorCode.NOT_FOUND,"User not found")
         );
 
         return userEntityMapper.toDomainEntity(jpaUser);
@@ -55,7 +55,7 @@ public class UserRepositoryAdapter implements IUserRepository {
     @Override
     public User save(User user) {
         if (jpaUserRepository.existsUsersByUsername(user.getUsername())) {
-            throw new AppException(ErrorCode.CONFLICT.withMessage("Username is already taken"));
+            throw new AppException(ErrorCode.CONFLICT,"Username is already taken");
         }
 
         var userRoles = roleRepository.findAllByNameIn(List.of(DEFAULT_ROLE));
@@ -70,7 +70,7 @@ public class UserRepositoryAdapter implements IUserRepository {
     @Override
     public User update(User newUser) {
         var jpaUser = jpaUserRepository.findById(newUser.getId()).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"))
+                () -> new AppException(ErrorCode.NOT_FOUND,"User not found")
         );
 
         var user = userEntityMapper.toDomainEntity(jpaUser);
@@ -83,7 +83,7 @@ public class UserRepositoryAdapter implements IUserRepository {
     @Override
     public void delete(User user) {
         var jpaUser = jpaUserRepository.findById(user.getId()).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"))
+                () -> new AppException(ErrorCode.NOT_FOUND,"User not found")
         );
 
         jpaUserRepository.delete(jpaUser);

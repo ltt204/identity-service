@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.ltt204.identityservice.presentations.web.advices.AppException;
 import org.ltt204.identityservice.presentations.web.advices.ErrorCode;
 
 @Data
@@ -14,12 +15,11 @@ import org.ltt204.identityservice.presentations.web.advices.ErrorCode;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApplicationResponseDto<T> {
     @Builder.Default
-    long code = 1000;
+    long statusCode = 1000;
+    String errorCode;
     String message;
-
     @Builder.Default
     boolean success = true;
-
     @Nullable
     T content;
 
@@ -52,7 +52,17 @@ public class ApplicationResponseDto<T> {
 
     public static <T> ApplicationResponseDto<T> failure(ErrorCode exception) {
         return ApplicationResponseDto.<T>builder()
-                .code(exception.getCode())
+                .statusCode(exception.getCode())
+                .errorCode(exception.getErrorCode())
+                .success(false)
+                .message(exception.getErrorCode())
+                .build();
+    }
+
+    public static<T> ApplicationResponseDto<T> failure(AppException exception) {
+        return ApplicationResponseDto.<T>builder()
+                .statusCode(exception.getError().getCode())
+                .errorCode(exception.getError().getErrorCode())
                 .success(false)
                 .message(exception.getMessage())
                 .build();

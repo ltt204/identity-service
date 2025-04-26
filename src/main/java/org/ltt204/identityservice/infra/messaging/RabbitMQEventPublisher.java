@@ -51,7 +51,7 @@ public class RabbitMQEventPublisher implements IEventPublisher {
         } catch (Exception e) {
             throw new AppException(
                     ErrorCode.RABBITMQ_PUBLISHING_ERROR
-                            .withMessage("Error while publishing event to RabbitMQ")
+                            .withErrorCode("Error while publishing event to RabbitMQ")
             );
         }
     }
@@ -67,7 +67,7 @@ public class RabbitMQEventPublisher implements IEventPublisher {
         } catch (Exception e) {
             throw new AppException(
                     ErrorCode.RABBITMQ_PUBLISHING_ERROR
-                            .withMessage("Error while publishing event to RabbitMQ")
+                            .withErrorCode("Error while publishing event to RabbitMQ")
             );
         }
     }
@@ -83,7 +83,7 @@ public class RabbitMQEventPublisher implements IEventPublisher {
         } catch (Exception e) {
             throw new AppException(
                     ErrorCode.RABBITMQ_PUBLISHING_ERROR
-                            .withMessage("Error while publishing event to RabbitMQ")
+                            .withErrorCode("Error while publishing event to RabbitMQ")
             );
         }
     }

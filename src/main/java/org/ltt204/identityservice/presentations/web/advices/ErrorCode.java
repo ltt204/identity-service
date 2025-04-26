@@ -36,11 +36,11 @@ public enum ErrorCode {
 
     private long code;
     @Setter
-    private String message;
+    private String errorCode;
     private HttpStatusCode httpStatusCode;
 
-    public ErrorCode withMessage(String message) {
-        this.setMessage(message);
+    public ErrorCode withErrorCode(String message) {
+        this.setErrorCode(message);
         return this;
     }
 }

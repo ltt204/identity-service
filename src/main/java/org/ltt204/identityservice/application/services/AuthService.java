@@ -36,7 +36,7 @@ public class AuthService implements IAuthService {
                     || tokenService.validateRefreshToken(token));
         } catch (JOSEException | ParseException e) {
             log.error(e.getMessage());
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED, "Invalid token");
         }
     }
 
@@ -46,10 +46,10 @@ public class AuthService implements IAuthService {
     ) {
         var user = userRepository.findFirstByUserName(signInCredentialsDto.getUsername());
 
-        var accessToken = tokenService.generateAccessToken(user);
-        var refreshToken = tokenService.generateRefreshToken(user);
-
         if (passwordEncoder.matches(signInCredentialsDto.getPassword(), user.getPassword())) {
+            var accessToken = tokenService.generateAccessToken(user);
+            var refreshToken = tokenService.generateRefreshToken(user);
+
             return AuthTokenDto.builder()
                     .authenticated(true)
                     .accessToken(accessToken)
@@ -57,7 +57,7 @@ public class AuthService implements IAuthService {
                     .build();
         }
 
-        throw new AppException(ErrorCode.UNAUTHENTICATED);
+        throw new AppException(ErrorCode.UNAUTHENTICATED, "Invalid credentials");
     }
 
     @Override
@@ -67,9 +67,7 @@ public class AuthService implements IAuthService {
         var isValid = tokenService.validateRefreshToken(refreshToken);
 
         if (!isValid) {
-            var error = ErrorCode.UNAUTHORIZED;
-            error.setMessage("Token is invalid");
-            throw new AppException(error);
+            throw new AppException(ErrorCode.UNAUTHORIZED, "Token is invalid");
         }
 
         var username = parse(accessToken).getJWTClaimsSet().getSubject();

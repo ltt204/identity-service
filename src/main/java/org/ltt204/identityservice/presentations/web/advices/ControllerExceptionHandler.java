@@ -38,7 +38,7 @@ public class ControllerExceptionHandler {
             var constrainViolation = exception.getBindingResult().getAllErrors().get(0).unwrap(ConstraintViolation.class);
             var attributes = constrainViolation.getConstraintDescriptor().getAttributes();
             log.info(attributes.toString());
-            error.setMessage(mapAttribute(error.getMessage(), attributes));
+            error.setErrorCode(mapAttribute(error.getErrorCode(), attributes));
         } catch (IllegalIdentifierException e) {
             // TODO: Handle later
         }
@@ -50,7 +50,8 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApplicationResponseDto<?>> handlingAppException(AppException exception) {
         var error = exception.getError();
-        var response = ApplicationResponseDto.failure(error);
+        var response = ApplicationResponseDto.failure(exception);
+
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
     }
 
@@ -58,11 +59,13 @@ public class ControllerExceptionHandler {
     ResponseEntity<ApplicationResponseDto<?>> handlingAuthorizeException(AuthorizationDeniedException exception) {
         var error = ErrorCode.UNAUTHORIZED;
         var response = ApplicationResponseDto.failure(error);
+
         return ResponseEntity.status(error.getHttpStatusCode()).body(response);
     }
 
     private String mapAttribute(String message, Map<String, Object> params) {
         var minValue = String.valueOf(params.get(MIN_ATTRIBUTE));
+
         return message.replace("{" + "min" + "}", minValue);
     }
 }

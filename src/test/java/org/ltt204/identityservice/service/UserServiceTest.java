@@ -103,7 +103,7 @@ class UserServiceTest {
     void findUserByName_userNotExisted_fail() {
         when(userRepository.findFirstByUserName(anyString())).then(
                 invocation -> {
-                    throw new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"));
+                    throw new AppException(ErrorCode.NOT_FOUND.withErrorCode("User not found"));
                 }
         );
 
@@ -127,7 +127,7 @@ class UserServiceTest {
     void findUserById_userNotExisted_fail() {
         when(userRepository.findById(anyString())).then(
                 invocation -> {
-                    throw new AppException(ErrorCode.NOT_FOUND.withMessage("User not found"));
+                    throw new AppException(ErrorCode.NOT_FOUND.withErrorCode("User not found"));
                 }
         );
 
