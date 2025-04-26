@@ -38,6 +38,7 @@ public class UserService implements IUserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         user = userRepository.save(user);
+
         var userCreatedEvent = UserCreatedEvent.builder()
                 .userId(user.getId())
                 .eventType(UserCreatedEvent.EVENT_TYPE)

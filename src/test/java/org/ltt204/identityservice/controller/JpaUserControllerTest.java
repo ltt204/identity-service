@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.ltt204.identityservice.application.dtos.user.UserDto;
 import org.ltt204.identityservice.application.services.UserService;
 import org.ltt204.identityservice.domain.entities.User;
+import org.ltt204.identityservice.domain.events.UserCreatedEvent;
+import org.ltt204.identityservice.infra.messaging.RabbitMQEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,12 +21,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(value = "/application-test.properties")
 class JpaUserControllerTest {
 
     @Autowired
@@ -31,6 +36,9 @@ class JpaUserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private RabbitMQEventPublisher rabbitMQEventPublisher;
 
     private User userCreateRequestDto;
     private UserDto userDto;
@@ -66,6 +74,8 @@ class JpaUserControllerTest {
         when(userService.create(any())).thenReturn(
                 userDto
         );
+
+        doNothing().when(rabbitMQEventPublisher).publishEvent(UserCreatedEvent.builder().build());
 
         // WHEN, THEN
         mockMvc.perform(MockMvcRequestBuilders

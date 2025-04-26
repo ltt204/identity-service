@@ -18,4 +18,6 @@ public interface IUserRepository {
     Page<User> findAll(Pageable pageable);
 
     boolean existsById(String id);
+
+    boolean existsByName(String name);
 }

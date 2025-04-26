@@ -8,6 +8,7 @@ import org.ltt204.identityservice.infra.persist.jpa.entities.JpaUser;
 import org.ltt204.identityservice.infra.persist.jpa.repositories.JpaRoleRepository;
 import org.ltt204.identityservice.infra.persist.jpa.repositories.JpaUserRepository;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,11 @@ import java.util.HashSet;
 @Configuration
 public class ApplicationInitConfig {
     @Bean
+    @ConditionalOnProperty(
+            prefix = "spring",
+            value = "datasource.driverClassName",
+            havingValue = "com.mysql.cj.jdbc.Driver"
+    )
     ApplicationRunner applicationRunner(
             JpaUserRepository userRepository,
             JpaRoleRepository jpaRoleRepository,

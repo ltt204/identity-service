@@ -8,10 +8,13 @@ logging:
     org.springframework.security.web: DEBUG
 
 spring:
+  application:
+    name: identity-service
   datasource:
     url: "jdbc:mysql://localhost:3306/identity-db"
     username: "root"
     password: "root"
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
   jpa:
     hibernate:
       ddl-auto: update
@@ -44,3 +47,7 @@ service:
     created: created
     updated: updated
     deleted: deleted
+
+eureka:
+  client:
+    eureka-server-port: 8761
